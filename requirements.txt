@@ -5,4 +5,4 @@ Jinja2==3.0.2
 mariadb==1.0.7
 MarkupSafe==2.0.1
 Werkzeug==2.0.2
-json
+
