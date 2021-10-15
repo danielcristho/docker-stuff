@@ -20,3 +20,15 @@ $ mariadb --host 127.0.0.1 -P 3306 --user root -pDBdemo123_
 > INSERT INTO data.people VALUES ('Franklin'), ('Michael Santana'), ('Trevour');
 > EXIT;
 ```
+### Python
+```
+#db connection information
+config = {
+    'host': '127.0.0.1',
+    'port': 3306,
+    'user': 'root',
+    'password': 'DBdemo123_',
+    'database': 'data'
+}
+```
+
