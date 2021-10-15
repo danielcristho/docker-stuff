@@ -31,4 +31,4 @@ config = {
     'database': 'data'
 }
 ```
-
+from this tutorial: https://dev.to/probablyrealrob/getting-started-with-mariadb-using-docker-python-and-flask-38a7
