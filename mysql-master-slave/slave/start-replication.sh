@@ -1,4 +1,7 @@
+
 #!/bin/bash
+
+# Reference: https://github.com/thomasvs/mysql-replication-start/blob/master/mysql-replication-start.sh
 
 usage() { echo "Usage: $0 -u REPLICA_USER -p REPLICA_PASS -m MASTER_HOST" 1>&2; exit 1; }
 
@@ -10,6 +13,8 @@ REPLICA_USER=$ROOT_USER
 REPLICA_PASS=$ROOT_PASS
 
 MASTER_HOST=10.0.0.10
+
+DUMP_FILE="/tmp/master_dump.sql"
 
 # Override through options
 while getopts ":u:p:m:" o; do
@@ -49,7 +54,6 @@ done
 echo "Connected to Master: $MASTER_HOST"
 
 # Create a dump of the master's databases
-DUMP_FILE="/tmp/master_dump.sql"
 echo "Dumping master databases to $DUMP_FILE"
 mysqldump -u $ROOT_USER -p$ROOT_PASS -h $MASTER_HOST --all-databases --master-data --single-transaction --flush-logs --events > $DUMP_FILE
 
@@ -78,8 +82,8 @@ mysql -u $ROOT_USER -p$ROOT_PASS -e "START SLAVE;"
 # Check if replication started successfully
 slave_status=$(mysql -u $ROOT_USER -p$ROOT_PASS -e "SHOW SLAVE STATUS\G")
 if echo "$slave_status" | grep -q "Slave_IO_Running: Yes" && echo "$slave_status" | grep -q "Slave_SQL_Running: Yes"; then
-  echo "Replication started successfully."
+    echo "Replication started successfully."
 else
-  echo "Error starting replication. Check slave status for more details:"
-  echo "$slave_status"
+    echo "Error starting replication. Check slave status for more details:"
+    echo "$slave_status"
 fi
