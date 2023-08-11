@@ -38,6 +38,25 @@ services:
     networks:
       - monitoring
 
+  grafana-sqlite:
+    networks:
+      - grafananet
+    image: grafana/grafana:latest
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./test/grafana/provisioning:/etc/grafana/provisioning:ro
+      - grafana_sqlite:/var/lib/grafana
+    env_file:
+      - ./test/grafana/setup.env
+    healthcheck:
+      test: wget --spider http://localhost:3000/robots.txt
+      interval: 5s
+      timeout: 3s
+      retries: 3
+    depends_on:
+      - prometheus
+
 networks:
   monitoring:
     driver: bridge
