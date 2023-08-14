@@ -3,13 +3,12 @@ global:
 
 scrape_configs:
   - job_name: 'prometheus'
-    static_targets:
+    static_configs:
       - targets: ['localhost:9090']
 
-  - job_name: 'node'
-    scrape_interval: 5s
-    static_targets:
-      - targets: ['localhost:9100']
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['node-exporter:9100']
 # remote_write:
 #   - url: '<Your Prometheus remote_write endpoint>'
 #     basic_auth:
