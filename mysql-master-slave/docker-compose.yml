@@ -1,4 +1,4 @@
-version: '3'
+version: '3.8'
 
 services:
     db-master:
@@ -20,7 +20,7 @@ services:
             TZ: "Asia/Jakarta"
         networks:
             example:
-                ipv4_address: 10.0.0.10
+                ipv4_address: 10.0.1.10
         healthcheck:
             test: "mysqladmin ping -u  db_user -pM64if0IhQgc1"
             interval: 2s
@@ -44,7 +44,7 @@ services:
             TZ: "Asia/Jakarta"
         networks:
             example:
-                ipv4_address: 10.0.0.11
+                ipv4_address: 10.0.1.11
         healthcheck:
             test: "mysqladmin ping -u  db_user -pM64if0IhQgc1"
             interval: 2s
@@ -54,7 +54,7 @@ networks:
     example:
         ipam:
             config:
-                - subnet: 10.0.0.0/24
+                - subnet: 10.0.1.0/24
         external: false
 
 volumes:

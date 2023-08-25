@@ -1,4 +1,3 @@
-
 #!/bin/bash
 
 # Reference: https://github.com/thomasvs/mysql-replication-start/blob/master/mysql-replication-start.sh
@@ -12,7 +11,7 @@ ROOT_PASS=M54if0IhQgc1
 REPLICA_USER=$ROOT_USER
 REPLICA_PASS=$ROOT_PASS
 
-MASTER_HOST=10.0.0.10
+MASTER_HOST=10.0.1.10
 
 DUMP_FILE="/tmp/master_dump.sql"
 
