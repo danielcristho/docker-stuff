@@ -1,0 +1,56 @@
+version: '3'
+
+services:
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    depends_on:
+      - prometheus
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN=admin
+      - GF_SECURITY_ADMIN_PASSWORD=admingrafana
+      - GF_DATABASE_TYPE=sqlite3
+      - GF_DATABASE_PATH=/var/lib/grafana/grafana.db
+    volumes:
+      - grafana-data:/var/lib/grafana
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    command:
+      - --config.file=/etc/prometheus/prometheus.yml
+    depends_on:
+      - node-exporter
+    ports:
+      - 9090:9090
+    volumes:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: always
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.ignored-mount-points="^/(sys|proc|dev|host|etc)($$|/)"
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /dev:/host/dev:ro
+
+  # grafana-db:
+  #   image: keinos/sqlite3
+  #   environment:
+  #     - SQLITE_DATABASE=grafana
+  #   volumes:
+  #     - /grafana-data:/var/lib/sqlite
+
+volumes:
+  grafana-data:
+  prometheus:
+  node-exporter:
