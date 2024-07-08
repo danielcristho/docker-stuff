@@ -2,7 +2,8 @@
 
 # Reference: https://github.com/thomasvs/mysql-replication-start/blob/master/mysql-replication-start.sh
 
-source ../.env
+# Load environment variables
+source .env
 
 usage() { echo "Usage: $0 -u REPLICA_USER -p REPLICA_PASS -m MASTER_HOST" 1>&2; exit 1; }
 
@@ -11,7 +12,7 @@ MYSQL_USER=$MYSQL_USER
 MYSQL_PASS=$MYSQL_PASSWORD
 
 REPLICA_USER=$MYSQL_USER
-REPLICA_PASSWORD=$MYSQL_PASSWORD
+REPLICA_PASS=$MYSQL_PASSWORD
 
 MASTER_HOST=10.0.1.10
 
@@ -19,40 +20,47 @@ DUMP_FILE="/tmp/master_dump.sql"
 
 # Override through options
 while getopts ":u:p:m:" o; do
-	case "${o}" in
-		u)
-			REPLICA_USER=${OPTARG}
-			;;
-		p)
-			REPLICA_PASS=${OPTARG}
-			;;
-		m)
-			MASTER_HOST=${OPTARG}
-			;;
-		*)
-			usage
-			;;
-	esac
+    case "${o}" in
+        u)
+            REPLICA_USER=${OPTARG}
+            ;;
+        p)
+            REPLICA_PASS=${OPTARG}
+            ;;
+        m)
+            MASTER_HOST=${OPTARG}
+            ;;
+        *)
+            usage
+            ;;
+    esac
 done
 shift $((OPTIND-1))
 
 # Check if mandatory options are provided
 if [[ -z $REPLICA_USER || -z $REPLICA_PASS || -z $MASTER_HOST ]]; then
-	usage
+    usage
 fi
 
-##
-# Start MySQL Replication
-##
+# Cleanup old data and restart Docker containers
+rm -rf ./master/data/*
+rm -rf ./slave/data/*
 
-echo "Starting MySQL Replication..."
+docker-compose down -v
+docker-compose up --build -d
 
-# Wait until the master server is reachable
-while ! mysqladmin ping -h $MASTER_HOST --silent; do
-	sleep 1
+until docker exec mysql-master sh -c 'export MYSQL_PWD=111; mysql -u root -e ";"'
+do
+    echo "Waiting for mysql-master database connection..."
+    sleep 4
 done
 
-echo "Connected to Master: $MASTER_HOST"
+# Create replica user and grant privileges
+priv_stmt="CREATE USER '$REPLICA_USER'@'%' IDENTIFIED BY '$REPLICA_PASS'; GRANT REPLICATION SLAVE ON *.* TO '$REPLICA_USER'@'%'; FLUSH PRIVILEGES;"
+docker exec mysql-master sh -c "export MYSQL_PWD=111; mysql -u root -e \"$priv_stmt\""
+
+# Start MySQL Replication
+echo "Starting MySQL Replication..."
 
 # Create a dump of the master's databases
 echo "Dumping master databases to $DUMP_FILE"

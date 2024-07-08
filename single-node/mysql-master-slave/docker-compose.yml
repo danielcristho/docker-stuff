@@ -11,18 +11,18 @@ services:
             - "3306:3306"
         volumes:
             - mysqldata_master:/var/lib/mysqldata_master
-            - ./master/init.sql:/docker-entrypoint-initdb.d/init.sql
+            # - ./master/init.sql:/docker-entrypoint-initdb.d/init.sql
         environment:
-            MYSQL_ALLOW_EMPTY_PASSWORD: 1
-            MYSQL_DATABASE: master
-            MYSQL_USER: db_user
-            MYSQL_PASSWORD: M64if0IhQgc1
-            TZ: "Asia/Jakarta"
+            MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            TZ: ${TZ}
         networks:
-            example:
+            database_net:
                 ipv4_address: 10.0.1.10
         healthcheck:
-            test: "mysqladmin ping -u  db_user -pM64if0IhQgc1"
+            test: "mysqladmin ping -u $MYSQL_USER -p$MYSQL_PASSWORD"
             interval: 2s
             retries: 20
     db-slave:
@@ -35,23 +35,24 @@ services:
             - "3307:3306"
         volumes:
             - ./slave/start-replication.sh:/docker-entrypoint-initdb.d/start-replication.sh
-            - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
+            # - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
             - mysqldata_slave:/var/lib/mysqldata_slave
         environment:
-            MYSQL_ROOT_PASSWORD: M54if0IhQgc1
-            MYSQL_USER:  db_user
-            MYSQL_PASSWORD: M64if0IhQgc1
-            TZ: "Asia/Jakarta"
+            MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            TZ: ${TZ}
         networks:
-            example:
+            database_net:
                 ipv4_address: 10.0.1.11
         healthcheck:
-            test: "mysqladmin ping -u  db_user -pM64if0IhQgc1"
+            test: "mysqladmin ping -u  $MYSQL_USER -p$MYSQL_PASSWORD"
             interval: 2s
             retries: 20
 
 networks:
-    example:
+    database_net:
         ipam:
             config:
                 - subnet: 10.0.1.0/24
