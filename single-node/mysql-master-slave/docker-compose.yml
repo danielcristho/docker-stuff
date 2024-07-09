@@ -5,49 +5,47 @@ services:
         build:
             context: ./master
             dockerfile: Dockerfile
-        container_name: mysql-master
+        container_name: mysql_master
         restart: unless-stopped
         ports:
             - "3306:3306"
         volumes:
             - mysqldata_master:/var/lib/mysqldata_master
-            # - ./master/init.sql:/docker-entrypoint-initdb.d/init.sql
         environment:
             MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-            TZ: ${TZ}
+            TZ: "Asia/Jakarta"
         networks:
             database_net:
                 ipv4_address: 10.0.1.10
         healthcheck:
-            test: "mysqladmin ping -u $MYSQL_USER -p$MYSQL_PASSWORD"
+            test: "mysqladmin ping -h 10.0.1.10"
             interval: 2s
             retries: 20
     db-slave:
         build:
             context: ./slave
             dockerfile: Dockerfile
-        container_name: mysql-slave
+        container_name: mysql_slave
         restart: unless-stopped
         ports:
             - "3307:3306"
         volumes:
-            - ./slave/start-replication.sh:/docker-entrypoint-initdb.d/start-replication.sh
-            # - ./slave/init.sql:/docker-entrypoint-initdb.d/init.sql
+            # - ./slave/start-replication.sh:/docker-entrypoint-initdb.d/start-replication.sh
             - mysqldata_slave:/var/lib/mysqldata_slave
         environment:
             MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
             MYSQL_DATABASE: ${MYSQL_DATABASE}
             MYSQL_USER: ${MYSQL_USER}
             MYSQL_PASSWORD: ${MYSQL_PASSWORD}
-            TZ: ${TZ}
+            TZ: "Asia/Jakarta"
         networks:
             database_net:
                 ipv4_address: 10.0.1.11
         healthcheck:
-            test: "mysqladmin ping -u  $MYSQL_USER -p$MYSQL_PASSWORD"
+            test: "mysqladmin ping -h 10.0.1.11"
             interval: 2s
             retries: 20
 

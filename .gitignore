@@ -1,2 +1,6 @@
 # Vscode
 /.vscode
+
+# Environment
+/.env
+/env
