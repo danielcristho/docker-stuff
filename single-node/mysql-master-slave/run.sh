@@ -29,7 +29,7 @@ done
 
 echo "Connected to Slave: $SLAVE_HOST"
 
-docker exec mysql_slave sh -c "mysql -u root -e 'STOP REPLICA'"
+docker exec mysql_slave sh -c "mysql -u root -e 'STOP SLAVE'"
 
 start_slave_stmt="CHANGE MASTER TO MASTER_HOST='$MASTER_HOST',MASTER_USER='$MYSQL_USER',MASTER_PASSWORD='$MYSQL_PASSWORD',MASTER_LOG_FILE='$CURRENT_LOG',MASTER_LOG_POS=$CURRENT_POS,MASTER_CONNECT_RETRY=10; START SLAVE;"
 docker exec mysql_slave sh -c "mysql -u root -e \"$start_slave_stmt\""
