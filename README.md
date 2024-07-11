@@ -6,7 +6,7 @@ Simple project while explore Docker.
 
 ### Single Node
 
-- [`MySQL Master Slave`](./single-node/mysql-master-slave/README.md) - Master slave replication using MySQL 8.
+- [`MySQL Master Slave`](./single-node/mysql-master-slave) - Master slave replication using MySQL 8.
 
 ### Multiple Node
 
