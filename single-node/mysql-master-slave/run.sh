@@ -1,3 +1,5 @@
+# Reference from: https://github.com/vbabak/docker-mysql-master-slave/blob/master/build.sh
+
 #!/bin/bash
 
 source .env
@@ -18,8 +20,6 @@ echo "Connected to Master: $MASTER_HOST"
 
 priv_stmt="GRANT REPLICATION SLAVE ON *.* TO '$MYSQL_USER'@'%'; FLUSH PRIVILEGES;"
 docker exec mysql_master sh -c "mysql -u root -e \"$priv_stmt\""
-
-
 
 while ! mysqladmin ping -h $SLAVE_HOST --silent; do
 	sleep 1
