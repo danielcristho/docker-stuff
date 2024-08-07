@@ -1,0 +1,36 @@
+{{ define "discord_message" }}
+  {{ if gt (len .Alerts.Firing) 0 }}
+    🔥 {{ len .Alerts.Firing }} alert(s) firing:
+    {{ range .Alerts.Firing }}
+      {{ template "discord_alert_firing" .}}
+    {{ end }}
+  {{ end }}
+  {{ if gt (len .Alerts.Resolved) 0 }}
+    ✅ {{ len .Alerts.Resolved }} alert(s) resolved:
+    {{ range .Alerts.Resolved }}
+      {{ template "discord_alert_resolved" .}}
+    {{ end }}
+  {{ end }}
+{{ end }}
+
+{{ define "discord_alert_firing" }}
+  Severity: {{ .Labels.severity }}
+  Alert Name: {{ .Labels.alertname }}
+  Summary: {{ .Annotations.summary }} <@&>
+  Node: {{ .Labels.server }}
+
+  Alert Values: {{ .Annotations.AlertValues }}
+  Silence all alerts for this node: http://localhost:3000/alerting/silence/new?matcher=node%3D{{ .Annotations.Node }}
+  Access dashboard: http://localhost:3000/d/rYdddlPWk/ppdb-jatim-prod?orgId=1&refresh=1m
+  Check Alert: http://localhost:3000/alerting/list
+{{ end }}
+
+{{ define "discord_alert_resolved" }}
+  Alert Name: {{ .Labels.alertname }}
+
+  Node: {{ .Labels.server }}
+  Alert Values: {{ .Annotations.AlertValues }}
+  Access dashboard: http://localhost:3000/d
+{{ end }}
+
+Message = {{ template "discord_message" . }}

@@ -1,0 +1,73 @@
+version: '3.8'
+
+services:
+  grafana:
+    image: grafana/grafana:11.1.2
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
+      - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
+    volumes:
+      - grafana-data:/var/lib/grafana
+      - ./grafana:/etc/grafana/provisioning/datasources
+    networks:
+      - grafana_network
+
+  prometheus:
+    image: prom/prometheus:v2.53.0
+    restart: unless-stopped
+    container_name: prometheus
+    command:
+      - --storage.tsdb.retention.time=7d
+      - --config.file=/etc/prometheus/prometheus.yml
+    depends_on:
+      - node-exporter
+    ports:
+      - 9090:9090
+    volumes:
+      - '/host/proc:/path.procfs'
+      - '/host/sys:/path.sysfs'
+      - '/:/host:ro'
+      - ./prometheus:/etc/prometheus
+      - "./prometheus/alert-rules.yml:/etc/prometheus/alert-rules.yml"
+      - prometheus:/prometheus
+
+  node-exporter:
+    image: prom/node-exporter:v1.8.2
+    container_name: node-exporter
+    restart: unless-stopped
+    ports:
+      - 9100:9100
+    command:
+      - --path.procfs=/host/proc
+      - --path.sysfs=/host/sys
+      - --collector.filesystem.ignored-mount-points=^/(sys|proc|dev|host|etc)($$|/)
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /dev:/host/dev:ro
+
+  alert-manager:
+    container_name: alert-manager
+    image: prom/alertmanager:v0.26.0
+    restart: unless-stopped
+    ports:
+      - "9093:9093"
+    volumes:
+      - "./prometheus/alertmanager.yml:/config/alertmanager.yml"
+      - "./prometheus/discord.tmpl:/config/discord.tmpl"
+      - alertmanager-data:/data
+    command: --config.file=/config/alertmanager.yml --log.level=debug
+
+networks:
+    grafana_network:
+      driver: bridge
+
+volumes:
+  grafana-data:
+  prometheus:
+  node-exporter:
+  alertmanager-data:
