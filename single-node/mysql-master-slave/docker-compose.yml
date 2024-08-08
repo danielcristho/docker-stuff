@@ -31,9 +31,8 @@ services:
         container_name: mysql_slave
         restart: unless-stopped
         ports:
-            - "3307:3306"
+            - "3307:3307"
         volumes:
-            # - ./slave/start-replication.sh:/docker-entrypoint-initdb.d/start-replication.sh
             - mysqldata_slave:/var/lib/mysqldata_slave
         environment:
             MYSQL_ALLOW_EMPTY_PASSWORD: ${MYSQL_ALLOW_EMPTY_PASSWORD}
