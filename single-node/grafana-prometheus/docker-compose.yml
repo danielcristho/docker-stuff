@@ -11,8 +11,9 @@ services:
       - GF_SECURITY_ADMIN_USER=${GF_SECURITY_ADMIN_USER}
       - GF_SECURITY_ADMIN_PASSWORD=${GF_SECURITY_ADMIN_PASSWORD}
     volumes:
-      - grafana-data:/var/lib/grafana
-      - ./grafana:/etc/grafana/provisioning/datasources
+      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./grafana/provisioning/datasources:/etc/grafana/provisioning/datasources
+      - ./grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
     networks:
       - grafana_network
 
@@ -67,7 +68,7 @@ networks:
       driver: bridge
 
 volumes:
-  grafana-data:
+  grafana:
   prometheus:
   node-exporter:
   alertmanager-data:

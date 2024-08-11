@@ -1,4 +1,4 @@
-# grafana-prometheus
+# Grafana-Prometheus
 
 Monitoring system resource using Grafana, Prometheus, Node exporter & Alert manager.
 
@@ -34,4 +34,3 @@ b90b6beaa911   prom/alertmanager:v0.26.0   "/bin/alertmanager -…"   5 seconds 
 
 ### Sending alert to Discord using Alert manager
 
-coming soon
