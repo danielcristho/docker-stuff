@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+    mariadb_incremental:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        container_name: mariadb_incremental
+        restart: unless-stopped
+        ports:
+            - "3306:3306"
+        volumes:
+            - mariadbdata_incremental:/var/lib/mariadbdata_incremental
+        environment:
+            MARIADB_ALLOW_EMPTY_ROOT_PASSWORD: ${MARIADB_ALLOW_EMPTY_ROOT_PASSWORD}
+            MARIADB_DATABASE: ${MARIADB_DATABASE}
+            MARIADB_USER: ${MARIADB_USER}
+            MARIADB_PASSWORD: ${MARIADB_PASSWORD}
+            TZ: "Asia/Jakarta"
+        networks:
+            database_net:
+                ipv4_address: 10.0.2.10
+        healthcheck:
+            test: "mysqladmin ping -h 10.0.2.10"
+            interval: 2s
+            retries: 20
+
+networks:
+    database_net:
+        ipam:
+            config:
+                - subnet: 10.0.2.0/24
+        external: false
+
+volumes:
+    mariadbdata_incremental:
