@@ -18,15 +18,15 @@ priv_stmt="GRANT ALL ON *.* TO '$MARIADB_USER'@'%'; FLUSH PRIVILEGES;"
 
 docker exec mariadb_incremental sh -c "mysql -u root -e \"$priv_stmt\""
 
+# Ensures backup directories exist
+docker exec mariadb_incremental sh -c "mkdir -p /var/mariadb/backup /var/mariadb/inc1 && chmod -R 777 /var/mariadb"
+
 # Do full backup
 full_backup="mariabackup --backup --target-dir=/var/mariadb/backup/ --user=$MARIADB_USER --password=$MARIADB_PASSWORD"
 
 docker exec mariadb_incremental sh -c "$full_backup"
 
-# # Do incremental backup
-# mariabackup --backup \
-#     --target-dir=/var/mariadb/inc1/ \
-#     --incremental-basedir=/var/mariadb/backup/ \
-#     --user=$MARIADB_USER --password=$MARIADB_PASSWORD
+# Do incremental backup
+incremental_backup="mariabackup --backup --target-dir=/var/mariadb/inc1/ --incremental-basedir=/var/mariadb/backup/ --user=$MARIADB_USER --password=$MARIADB_PASSWORD"
 
-
+docker exec mariadb_incremental sh -c "$incremental_backup"
